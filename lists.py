@@ -177,7 +177,7 @@ full_list_of_the_excursions = [#0
 взаимодействовать с которыми можно и нужно: исследовать, собирать, разгадывать головоломки, дергать, прыгать и даже \
 кричать.\n\n\
 Официальный сайт экскурсии:\n https://experimentanium.ru/']
-list_new_year = [full_list_of_the_excursions[0], full_list_of_the_excursions[1], full_list_of_the_excursions[3]]
+list_new_year = [full_list_of_the_excursions[0], full_list_of_the_excursions[1], full_list_of_the_excursions[2]]
 list_cosmos = [full_list_of_the_excursions[6], full_list_of_the_excursions[7], full_list_of_the_excursions[8],
                full_list_of_the_excursions[9], full_list_of_the_excursions[25]]
 list_history = [full_list_of_the_excursions[3], full_list_of_the_excursions[4], full_list_of_the_excursions[5],
@@ -187,6 +187,6 @@ list_military = [full_list_of_the_excursions[3], full_list_of_the_excursions[4],
                  full_list_of_the_excursions[17], full_list_of_the_excursions[21]]
 list_literature = [full_list_of_the_excursions[10], full_list_of_the_excursions[11], full_list_of_the_excursions[18],
                    full_list_of_the_excursions[19]]
-list_production = [full_list_of_the_excursions[1], full_list_of_the_excursions[22], full_list_of_the_excursions[23]]
+list_production = [full_list_of_the_excursions[0], full_list_of_the_excursions[22], full_list_of_the_excursions[23]]
 list_science = [full_list_of_the_excursions[6], full_list_of_the_excursions[20], full_list_of_the_excursions[24],
                 full_list_of_the_excursions[25]]
