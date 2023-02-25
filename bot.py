@@ -38,14 +38,18 @@ async def rand(update, context):
 
 
 async def select(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/военно-исторические'], ['/исторические'], [''], ['/back']],
-                                      resize_keyboard=True)
+    my_keyboard = ReplyKeyboardMarkup([['/New_Year', '/cosmonautics'], ['/historical', '/military_historical'],
+                                       ['/literature', '/production'], ['/scientific'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите тему экскурсии: \n"
-                                        "/заглушка0 \n"
-                                        "/заглушка1 \n"
-                                        "/заглушка2 \n"
-                                        "/back - возврат на экран выбора команд", reply_markup=my_keyboard)
+                                        "/New_Year - новогодние экскурсии \n"
+                                        "/cosmonautics - экскурсии о космосе \n"
+                                        "/historical - исторические экскурсии \n"
+                                        "/military_historical - военно-исторические экскурсии \n"
+                                        "/literature - экскурсии о писателях и литературных произведениях \n"
+                                        "/production - экскурсии на производства \n"
+                                        "/scientific - экскурсии о науке \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
 async def top(update, context):
@@ -68,6 +72,69 @@ async def back(update, context):
                                         "", reply_markup=my_keyboard)
 
 
+async def New_Year(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_new_year'], ['/lists_new_year'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_new_year - случайная экскурсия по выбранной тематике \n"
+                                        "/list_new_year - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
+async def cosmonautics(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_cosmos'], ['/lists_cosmos'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_cosmos - случайная экскурсия по выбранной тематике \n"
+                                        "/list_cosmos - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
+async def historical(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_history'], ['/lists_history'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_history - случайная экскурсия по выбранной тематике \n"
+                                        "/list_history - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
+async def military_historical(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_mil_history'], ['/lists_mil_history'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_mil_history - случайная экскурсия по выбранной тематике \n"
+                                        "/list_mil_history - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
+async def literature(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_lit'], ['/lists_lit'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_lit - случайная экскурсия по выбранной тематике \n"
+                                        "/list_lit - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
+async def production(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_prod'], ['/lists_prod'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_prod - случайная экскурсия по выбранной тематике \n"
+                                        "/list_prod - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
+async def scientific(update, context):
+    my_keyboard = ReplyKeyboardMarkup([['/rand_sc'], ['/lists_sc'], ['/back']], resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_sc - случайная экскурсия по выбранной тематике \n"
+                                        "/list_sc - вывести  \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+
+
 if __name__ == '__main__':
     TOKEN
     application = ApplicationBuilder().token(TOKEN).build()    # создание экземпляра бота через `ApplicationBuilder`
@@ -76,9 +143,23 @@ if __name__ == '__main__':
     select_handler = CommandHandler('select', select)   # обработка команды '/select'
     top_handler = CommandHandler('top', top)  # обработка команды '/top'
     back_handler = CommandHandler('back', back)  # обработка команды '/back'
-    application.add_handler(start_handler)  # регистрируем обработчик в приложение
+    ny_handler = CommandHandler('New_Year', New_Year)   # обработка команды '/New_Year'
+    cosmos_handler = CommandHandler('cosmonautics', cosmonautics)   # обработка команды 'cosmonautics'
+    hys_handler = CommandHandler('historical', historical)  # обработка команды 'historical'
+    mihy_handler = CommandHandler('military_historical', military_historical)  # обработка команды 'military_historical'
+    lit_handler = CommandHandler('literature', literature)  # обработка команды 'literature'
+    prod_handler = CommandHandler('production', production)  # обработка команды 'production'
+    sc_handler = CommandHandler('scientific', scientific)  # обработка команды 'production'
+    application.add_handler(start_handler)  # регистрируем обработчики в приложение
     application.add_handler(rand_handler)
     application.add_handler(select_handler)
     application.add_handler(top_handler)
     application.add_handler(back_handler)
+    application.add_handler(ny_handler)
+    application.add_handler(cosmos_handler)
+    application.add_handler(hys_handler)
+    application.add_handler(mihy_handler)
+    application.add_handler(lit_handler)
+    application.add_handler(prod_handler)
+    application.add_handler(sc_handler)
     application.run_polling()   # запуск
