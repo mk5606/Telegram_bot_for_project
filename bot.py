@@ -8,7 +8,7 @@ from lists import full_list_of_the_excursions, list_science, list_literature, li
 from lists import list_new_year, list_production
 
 
-async def start(update, context):
+async def start(update, context):  # update связан с отправкой сообщений, context - с контекстом обработанного сообщения
     my_keyboard = ReplyKeyboardMarkup([['/rand'], ['/select'], ['/top']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,    # ожидание отправки сообщения
                                    text=f"Здравствуй, {format(update.message.chat.first_name)}! \n"
@@ -78,7 +78,7 @@ async def New_Year(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_new_year - случайная экскурсия по выбранной тематике \n"
-                                        "/list_new_year - вывести  \n"
+                                        "/lists_new_year - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -105,12 +105,20 @@ async def rand_new_year(update, context):
                                    text=f"{full_list_of_the_excursions[num - 1]}")
 
 
+async def lists_new_year(update, context):
+    spisok = 'Список всех экскурсий по выбранной теме:\n'
+    for i in list_new_year:
+        i.split('\n')
+        spisok += i[0] + '\n'
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{spisok}')
+
+
 async def cosmonautics(update, context):
     my_keyboard = ReplyKeyboardMarkup([['/rand_cosmos'], ['/lists_cosmos'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_cosmos - случайная экскурсия по выбранной тематике \n"
-                                        "/list_cosmos - вывести  \n"
+                                        "/lists_cosmos - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -141,7 +149,7 @@ async def historical(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_history - случайная экскурсия по выбранной тематике \n"
-                                        "/list_history - вывести  \n"
+                                        "/lists_history - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -172,7 +180,7 @@ async def military_historical(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_mil_history - случайная экскурсия по выбранной тематике \n"
-                                        "/list_mil_history - вывести  \n"
+                                        "/lists_mil_history - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -203,7 +211,7 @@ async def literature(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_lit - случайная экскурсия по выбранной тематике \n"
-                                        "/list_lit - вывести  \n"
+                                        "/lists_lit - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -234,7 +242,7 @@ async def production(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_prod - случайная экскурсия по выбранной тематике \n"
-                                        "/list_prod - вывести  \n"
+                                        "/lists_prod - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -265,7 +273,7 @@ async def scientific(update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
                                         "/rand_sc - случайная экскурсия по выбранной тематике \n"
-                                        "/list_sc - вывести  \n"
+                                        "/lists_sc - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
@@ -313,6 +321,7 @@ if __name__ == '__main__':
     rlit_handler = CommandHandler('rand_lit', rand_lit)  # обработка команды 'rand_lit'
     rprod_handler = CommandHandler('rand_prod', rand_prod)  # обработка команды 'rand_prod'
     rsc_handler = CommandHandler('rand_sc', rand_sc)  # обработка команды 'rand_sc'
+    #lny_handler = CommandHandler('lists_new_year', lists_new_year)  # обработка команды 'lists_new_year'
     application.add_handler(start_handler)  # регистрируем обработчики в приложение
     application.add_handler(rand_handler)
     application.add_handler(select_handler)
@@ -332,4 +341,5 @@ if __name__ == '__main__':
     application.add_handler(rlit_handler)
     application.add_handler(rprod_handler)
     application.add_handler(rsc_handler)
+    #application.add_handler(lny_handler)
     application.run_polling()   # запуск
