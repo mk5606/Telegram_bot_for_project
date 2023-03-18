@@ -8,6 +8,10 @@ from lists import full_list_of_the_excursions, list_science, list_literature, li
 from lists import list_new_year, list_production
 
 
+theme = ''
+count = 0
+
+
 async def start(update, context):  # update связан с отправкой сообщений, context - с контекстом обработанного сообщения
     my_keyboard = ReplyKeyboardMarkup([['/rand'], ['/select'], ['/top']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,    # ожидание отправки сообщения
@@ -40,7 +44,8 @@ async def rand(update, context):
 
 async def select(update, context):
     my_keyboard = ReplyKeyboardMarkup([['/New_Year', '/cosmonautics'], ['/historical', '/military_historical'],
-                                       ['/literature', '/production'], ['/scientific'], ['/back']], resize_keyboard=True)
+                                       ['/literature', '/production'], ['/scientific'], ['/back']],
+                                       resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите тему экскурсии: \n"
                                         "/New_Year - новогодние экскурсии \n"
@@ -54,6 +59,9 @@ async def select(update, context):
 
 
 async def top(update, context):
+    global theme, count
+    theme = ''
+    count = 0
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Топ по всем темам: \n"
                                         "1 \n"
@@ -64,6 +72,9 @@ async def top(update, context):
 
 
 async def back(update, context):
+    global theme, count
+    theme = ''
+    count = 0
     my_keyboard = ReplyKeyboardMarkup([['/rand'], ['/select'], ['/top']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
@@ -73,21 +84,15 @@ async def back(update, context):
                                         "", reply_markup=my_keyboard)
 
 
-async def New_Year(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_new_year'], ['/lists_new_year'], ['/back']], resize_keyboard=True)
-    await context.bot.send_message(chat_id=update.effective_chat.id,
-                                   text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_new_year - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_new_year - вывести список всех экскурсий по теме \n"
-                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_new_year(update, context):
-    num_in_our_list = randint(1, len(list_new_year))
+async def rand_theme(update, context):
+    dict_rashifrovka = {'ny': list_new_year, 'cos': list_cosmos, 'hi': list_history, 'mi': list_military,
+                        'li': list_literature, 'pr': list_production, 'sc': list_science}
+    new_sp = dict_rashifrovka[theme]
+    num_in_our_list = randint(1, len(new_sp))
     list_of_photo = glob('img/*')
     num = 1
     for j in full_list_of_the_excursions:
-        if j != list_new_year[num_in_our_list - 1]:
+        if j != new_sp[num_in_our_list - 1]:
             num += 1
         else:
             break
@@ -105,198 +110,143 @@ async def rand_new_year(update, context):
                                    text=f"{full_list_of_the_excursions[num - 1]}")
 
 
-async def lists_new_year(update, context):
+async def lists_theme(update, context):
     spisok = 'Список всех экскурсий по выбранной теме:\n'
-    for i in list_new_year:
-        i.split('\n')
-        spisok += i[0] + '\n'
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'{spisok}')
+    dict_rashifrovka = {'ny': list_new_year, 'cos': list_cosmos, 'hi': list_history, 'mi': list_military,
+                        'li': list_literature, 'pr': list_production, 'sc': list_science}
+    new_sp = dict_rashifrovka[theme]
+    my_keyboard = ReplyKeyboardMarkup([['/next_excursion'], ['/rand_theme'], ['/back']], resize_keyboard=True)
+    for i in new_sp:
+        sp = i.split('\n')
+        spisok += f'{new_sp.index(i) + 1}' + ') ' + sp[0] + '\n'
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{spisok}")
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/next_excursion - просмотр экскурсий из предложенного списка \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "", reply_markup=my_keyboard)
+
+
+async def next_excursion(update, context):
+    global count
+    dict_rashifrovka = {'ny': list_new_year, 'cos': list_cosmos, 'hi': list_history, 'mi': list_military,
+                        'li': list_literature, 'pr': list_production, 'sc': list_science}
+    new_sp = dict_rashifrovka[theme]
+    len_of_excursion = len(new_sp)
+    my_keyboard = ReplyKeyboardMarkup([['/back']], resize_keyboard=True)
+    if count == len_of_excursion:
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text="Вы ознакомились со всеми экскурсиями по данной теме \n")
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text="Выберите команду для продолжения работы с ботом: \n"
+                                            "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+    else:
+        num = 1
+        list_of_photo = glob('img/*')
+        for j in full_list_of_the_excursions:
+            if j != new_sp[count]:
+                num += 1
+            else:
+                break
+        for i in list_of_photo:
+            if len(str(num)) == 1:
+                if i[4] == str(num):
+                    picture = i
+                    break
+            if len(str(num)) == 2:
+                if i[4:6] == str(num):
+                    picture = i
+                    break
+        count += 1
+        await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text=f"{full_list_of_the_excursions[num - 1]}")
+
+
+async def New_Year(update, context):
+    global theme, count
+    theme = 'ny'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']],
+                                      resize_keyboard=True)
+    await context.bot.send_message(chat_id=update.effective_chat.id,
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
+                                        "/back - вернуться к выбору команд", reply_markup=my_keyboard)
 
 
 async def cosmonautics(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_cosmos'], ['/lists_cosmos'], ['/back']], resize_keyboard=True)
+    global theme, count
+    theme = 'cos'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']],
+                                      resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_cosmos - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_cosmos - вывести список всех экскурсий по теме \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_cosmos(update, context):
-    num_in_our_list = randint(1, len(list_cosmos))
-    list_of_photo = glob('img/*')
-    num = 1
-    for j in full_list_of_the_excursions:
-        if j != list_cosmos[num_in_our_list - 1]:
-            num += 1
-        else:
-            break
-    for i in list_of_photo:
-        if len(str(num)) == 1:
-            if i[4] == str(num):
-                picture = i
-                break
-        if len(str(num)) == 2:
-            if i[4:6] == str(num):
-                picture = i
-                break
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{full_list_of_the_excursions[num - 1]}")
 
 
 async def historical(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_history'], ['/lists_history'], ['/back']], resize_keyboard=True)
+    global theme, count
+    theme = 'hi'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_history - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_history - вывести список всех экскурсий по теме \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_history(update, context):
-    num_in_our_list = randint(1, len(list_history))
-    list_of_photo = glob('img/*')
-    num = 1
-    for j in full_list_of_the_excursions:
-        if j != list_history[num_in_our_list - 1]:
-            num += 1
-        else:
-            break
-    for i in list_of_photo:
-        if len(str(num)) == 1:
-            if i[4] == str(num):
-                picture = i
-                break
-        if len(str(num)) == 2:
-            if i[4:6] == str(num):
-                picture = i
-                break
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{full_list_of_the_excursions[num - 1]}")
 
 
 async def military_historical(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_mil_history'], ['/lists_mil_history'], ['/back']], resize_keyboard=True)
+    global theme, count
+    theme = 'mi'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_mil_history - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_mil_history - вывести список всех экскурсий по теме \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_mil_history(update, context):
-    num_in_our_list = randint(1, len(list_military))
-    list_of_photo = glob('img/*')
-    num = 1
-    for j in full_list_of_the_excursions:
-        if j != list_military[num_in_our_list - 1]:
-            num += 1
-        else:
-            break
-    for i in list_of_photo:
-        if len(str(num)) == 1:
-            if i[4] == str(num):
-                picture = i
-                break
-        if len(str(num)) == 2:
-            if i[4:6] == str(num):
-                picture = i
-                break
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{full_list_of_the_excursions[num - 1]}")
 
 
 async def literature(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_lit'], ['/lists_lit'], ['/back']], resize_keyboard=True)
+    global theme, count
+    theme = 'li'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_lit - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_lit - вывести список всех экскурсий по теме \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_lit(update, context):
-    num_in_our_list = randint(1, len(list_literature))
-    list_of_photo = glob('img/*')
-    num = 1
-    for j in full_list_of_the_excursions:
-        if j != list_literature[num_in_our_list - 1]:
-            num += 1
-        else:
-            break
-    for i in list_of_photo:
-        if len(str(num)) == 1:
-            if i[4] == str(num):
-                picture = i
-                break
-        if len(str(num)) == 2:
-            if i[4:6] == str(num):
-                picture = i
-                break
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{full_list_of_the_excursions[num - 1]}")
 
 
 async def production(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_prod'], ['/lists_prod'], ['/back']], resize_keyboard=True)
+    global theme, count
+    theme = 'pr'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_prod - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_prod - вывести список всех экскурсий по теме \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_prod(update, context):
-    num_in_our_list = randint(1, len(list_production))
-    list_of_photo = glob('img/*')
-    num = 1
-    for j in full_list_of_the_excursions:
-        if j != list_production[num_in_our_list - 1]:
-            num += 1
-        else:
-            break
-    for i in list_of_photo:
-        if len(str(num)) == 1:
-            if i[4] == str(num):
-                picture = i
-                break
-        if len(str(num)) == 2:
-            if i[4:6] == str(num):
-                picture = i
-                break
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{full_list_of_the_excursions[num - 1]}")
 
 
 async def scientific(update, context):
-    my_keyboard = ReplyKeyboardMarkup([['/rand_sc'], ['/lists_sc'], ['/back']], resize_keyboard=True)
+    global theme, count
+    theme = 'sc'
+    count = 0
+    my_keyboard = ReplyKeyboardMarkup([['/rand_theme'], ['/lists_theme'], ['/back']], resize_keyboard=True)
     await context.bot.send_message(chat_id=update.effective_chat.id,
                                    text="Выберите команду для продолжения работы с ботом: \n"
-                                        "/rand_sc - случайная экскурсия по выбранной тематике \n"
-                                        "/lists_sc - вывести список всех экскурсий по теме \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "/lists_theme - вывести список всех экскурсий по теме \n"
                                         "/back - вернуться к выбору команд", reply_markup=my_keyboard)
-
-
-async def rand_sc(update, context):
-    num_in_our_list = randint(1, len(list_science))
-    list_of_photo = glob('img/*')
-    num = 1
-    for j in full_list_of_the_excursions:
-        if j != list_science[num_in_our_list - 1]:
-            num += 1
-        else:
-            break
-    for i in list_of_photo:
-        if len(str(num)) == 1:
-            if i[4] == str(num):
-                picture = i
-                break
-        if len(str(num)) == 2:
-            if i[4:6] == str(num):
-                picture = i
-                break
-    await context.bot.send_photo(chat_id=update.effective_chat.id, photo=open(picture, 'rb'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{full_list_of_the_excursions[num - 1]}")
 
 
 if __name__ == '__main__':
@@ -314,14 +264,9 @@ if __name__ == '__main__':
     lit_handler = CommandHandler('literature', literature)  # обработка команды 'literature'
     prod_handler = CommandHandler('production', production)  # обработка команды 'production'
     sc_handler = CommandHandler('scientific', scientific)  # обработка команды 'production'
-    rny_handler = CommandHandler('rand_new_year', rand_new_year)  # обработка команды 'rand_new_year'
-    rcos_handler = CommandHandler('rand_cosmos', rand_cosmos)  # обработка команды 'rand_cosmos'
-    rhis_handler = CommandHandler('rand_history', rand_history)  # обработка команды 'rand_history'
-    rmil_handler = CommandHandler('rand_mil_history', rand_mil_history)  # обработка команды 'rand_mil_history'
-    rlit_handler = CommandHandler('rand_lit', rand_lit)  # обработка команды 'rand_lit'
-    rprod_handler = CommandHandler('rand_prod', rand_prod)  # обработка команды 'rand_prod'
-    rsc_handler = CommandHandler('rand_sc', rand_sc)  # обработка команды 'rand_sc'
-    #lny_handler = CommandHandler('lists_new_year', lists_new_year)  # обработка команды 'lists_new_year'
+    rth_handler = CommandHandler('rand_theme', rand_theme)    # обработка команды 'rand_theme'
+    lth_handler = CommandHandler('lists_theme', lists_theme)    # обработка команды 'lists_theme'
+    next_handler = CommandHandler('next_excursion', next_excursion)     # обработка команды 'next_excursion'
     application.add_handler(start_handler)  # регистрируем обработчики в приложение
     application.add_handler(rand_handler)
     application.add_handler(select_handler)
@@ -334,12 +279,7 @@ if __name__ == '__main__':
     application.add_handler(lit_handler)
     application.add_handler(prod_handler)
     application.add_handler(sc_handler)
-    application.add_handler(rny_handler)
-    application.add_handler(rcos_handler)
-    application.add_handler(rhis_handler)
-    application.add_handler(rmil_handler)
-    application.add_handler(rlit_handler)
-    application.add_handler(rprod_handler)
-    application.add_handler(rsc_handler)
-    #application.add_handler(lny_handler)
+    application.add_handler(rth_handler)
+    application.add_handler(lth_handler)
+    application.add_handler(next_handler)
     application.run_polling()   # запуск
