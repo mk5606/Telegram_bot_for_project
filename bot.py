@@ -5,7 +5,7 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
 from settings import TOKEN
 from lists import full_list_of_the_excursions, list_science, list_literature, list_cosmos, list_history, list_military
-from lists import list_new_year, list_production
+from lists import list_new_year, list_production, list_best
 
 
 sp_for_rand = random.sample(full_list_of_the_excursions, len(full_list_of_the_excursions))
@@ -80,15 +80,19 @@ async def select(update, context):
 
 async def top(update, context):
     global theme, count
-    theme = ''
+    theme = 'top'
     count = 0
+    spisok = 'Лучшие экскурсии по всем темам:\n'
+    my_keyboard = ReplyKeyboardMarkup([['/next_excursion'], ['/back']], resize_keyboard=True)
+    for i in list_best:
+        sp = i.split('\n')
+        spisok += f'{list_best.index(i) + 1}' + ') ' + sp[0] + '\n'
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{spisok}")
     await context.bot.send_message(chat_id=update.effective_chat.id,
-                                   text="Топ по всем темам: \n"
-                                        "1 \n"
-                                        "2 \n"
-                                        "3 \n"
-                                        "4 \n"
-                                        "5 \n")
+                                   text="Выберите команду для продолжения работы с ботом: \n"
+                                        "/next_excursion - просмотр экскурсий из предложенного списка \n"
+                                        "/rand_theme - случайная экскурсия по выбранной тематике \n"
+                                        "", reply_markup=my_keyboard)
 
 
 async def back(update, context):
@@ -150,11 +154,18 @@ async def lists_theme(update, context):
 async def next_excursion(update, context):
     global count
     dict_rashifrovka = {'ny': list_new_year, 'cos': list_cosmos, 'hi': list_history, 'mi': list_military,
-                        'li': list_literature, 'pr': list_production, 'sc': list_science}
+                        'li': list_literature, 'pr': list_production, 'sc': list_science, 'top': list_best}
     my_keyboard = ReplyKeyboardMarkup([['/back']], resize_keyboard=True)
     new_sp = dict_rashifrovka[theme]
     len_of_excursion = len(new_sp)
-    if count == len_of_excursion:
+    if count == len_of_excursion and theme == 'top':
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text="Вы ознакомились со всеми экскурсиями, которые "
+                                            "пользователи посчитали лучшими \n")
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text="Выберите команду для продолжения работы с ботом: \n"
+                                            "/back - вернуться к выбору команд", reply_markup=my_keyboard)
+    if count == len_of_excursion and theme != 'top':
         await context.bot.send_message(chat_id=update.effective_chat.id,
                                        text="Вы ознакомились со всеми экскурсиями по данной теме \n")
         await context.bot.send_message(chat_id=update.effective_chat.id,

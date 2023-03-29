@@ -231,3 +231,5 @@ list_production = [full_list_of_the_excursions[0], full_list_of_the_excursions[2
 list_science = [full_list_of_the_excursions[6], full_list_of_the_excursions[20], full_list_of_the_excursions[24],
                 full_list_of_the_excursions[25], full_list_of_the_excursions[27], full_list_of_the_excursions[28],
                 full_list_of_the_excursions[29], full_list_of_the_excursions[30], full_list_of_the_excursions[31]]
+list_best = [full_list_of_the_excursions[23], full_list_of_the_excursions[6], full_list_of_the_excursions[22],
+             full_list_of_the_excursions[25], full_list_of_the_excursions[9], full_list_of_the_excursions[20]]
